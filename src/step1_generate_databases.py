@@ -599,26 +599,12 @@ def main(input_folder, output_dir):
 
 
 if __name__ == "__main__":
-    
-    # # 📌 Paste your input folder path containing ('.pdb', '.cif', '.ent') files
-    # input_folder =r"/home/srimaha/Pictures/scripts/Bacillus_Thermoproteolyticus/input"
-    
-    # # 📌 Paste your output folder path where database files will be saved
-    # output_dir = r"/home/srimaha/Pictures/scripts/Bacillus_Thermoproteolyticus/databases"
-    
-    # print("🚀 Script started...")
-    #     if not os.path.isdir(folder):
-    #         print(f"❌ Input folder does not exist: {folder}")
-    #         sys.exit(1)
-            
-    # main(input_folder, output_dir)
-    
-    
+       
     # 📌 Paste your input folder path containing ('.pdb', '.cif', '.ent') files
-    input_folder = r"/home/srimaha/Pictures/scripts/data/input/coord_52"
+    input_folder = r"/path/to/input/folder"
     
     # 📌 Paste your output folder path where database files will be saved
-    output_db_dir = r"/home/srimaha/Pictures/scripts/data/databases/coord_52"
+    output_db_dir = r"/path/to/output/folder"
     
     print("🚀 Script started...")
     # for folder in input_folder:
@@ -627,17 +613,3 @@ if __name__ == "__main__":
         sys.exit(1)
             
     main(input_folder, output_db_dir)
-    
-    
-    # # 📌 Paste your input folder path containing ('.pdb', '.cif', '.ent') files
-    # input_folder = r"/path/to/your/input"
-    
-    # # 📌 Paste your output folder path where database files will be saved
-    # output_dir = r"/path/to/your/databases"
-    
-    # print("🚀 Script started...")
-    #     if not os.path.isdir(folder):
-    #         print(f"❌ Input folder does not exist: {folder}")
-    #         sys.exit(1)
-            
-    # main(input_folders, output_dir)
