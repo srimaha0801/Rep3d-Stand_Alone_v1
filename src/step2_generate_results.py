@@ -24,6 +24,28 @@ warnings.simplefilter("ignore", PDBConstructionWarning)
 ###############################################################################
 
 
+def extract_ca_coordinates(pdb_file, start_res, end_res, chain_id):
+    parser = PDBParser(QUIET=True)
+    structure = parser.get_structure("protein", pdb_file)
+
+    coords = []
+
+    for model in structure:
+        for chain in model:
+            if chain.id != chain_id:
+                continue
+
+            for residue in chain:
+                res_id = residue.get_id()[1]
+
+                if start_res <= res_id <= end_res:
+                    if "CA" in residue:
+                        atom = residue["CA"]
+                        x, y, z = atom.get_coord()
+                        coords.append((res_id, f"({x:.3f} {y:.3f} {z:.3f})"))
+
+    return coords
+
 def get_user_coordinates(usr_coord):
     try:
         coordinates = [tuple(map(float, coord.split())) for coord in re.findall(r'\((.*?)\)', usr_coord)]
@@ -229,6 +251,7 @@ def add_tsv_header(usr_coord,user_sequence_str,file):
         f.write("# Institution: IISc, Bangalore.\n\n")
 
         f.write(f"# Input coordinates: {coord}\n")
+        f.write(f"# Symbol sequence derived from input coordinates: {user_sequence_str}\n")
         f.write(f"# Number of coordinates: {coord_len}\n\n")
         
         f.write("# ===================== Results =====================\n\n")
@@ -384,18 +407,40 @@ def main(usr_coord,results_path,symbols_db_path,amino_acid_seq_db_path,filters):
     
     
 if __name__ == "__main__":
-    
-    # 📌 Paste your coordinates
-    usr_coord = ""
+
+    use_pdb_file_input = True   # switch between manual / file input
+
+    if use_pdb_file_input:
+        pdb_file = input("📌 Enter PDB file path: ").strip()
+        chain_id = input("📌 Enter Chain ID (e.g., A): ").strip()
+
+        pos_input = input("📌 Enter residue range (e.g., 2-6): ").strip()
+        start_res, end_res = map(int, pos_input.split("-"))
+
+        print(f"\n Extracting CA coordinates from {pdb_file} | Chain {chain_id} ({start_res}-{end_res})")
+
+        coords_with_ids = extract_ca_coordinates(pdb_file, start_res, end_res, chain_id)
+
+        if not coords_with_ids:
+            print(" No coordinates found! Check chain or residue range.")
+            exit()
+
+        usr_coord = ",".join([coord for _, coord in coords_with_ids])
+        print("\n Extracted Coordinates:",usr_coord)
+        
+
+    else:
+        # 📌 Paste your coordinates
+        usr_coord = "(19.262   0.072  21.331),(17.754   2.501  18.817),(14.012   3.223  18.875),(12.146   2.940  15.553),(9.876   5.731  14.223)"
     
     # 📌 Paste your symbols database path (symbols.db)
-    symbols_db_path = "/path/to/your/databases/symbols.db"
+    symbols_db_path = r"path/to/symbols.db"
 
     # 📌 Paste your amino acid sequence database (amino_acid_seq.db)
-    amino_acid_seq_db_path = "/path/to/your/databases/amino_acid_seq.db"
+    amino_acid_seq_db_path = r"path/to/amino_acid_seq.db"
 
     # 📌 Output directory where results will be stored
-    results_path = "/path/to/your/output/"
+    results_path = r"path/to/result/folder"
     
     # Filters
     # If you want filters → put True, else False
@@ -404,11 +449,11 @@ if __name__ == "__main__":
     if filter_choice:
         filters = {
             # filter: organism name or leave it ""
-            "organism": "homo sapiens",
+            "organism": "",
             # filter: experiment method (or "")
-            "method": "x-ray diffraction",
+            "method": "",
             # filter: resolution condition (e.g., greater_than 2.0, between 1.0 2.5)
-            "resolution": "greater_than 2.5",
+            "resolution": "",
             # filter: R-factor condition (or "")
             "rfac": "",
             # filter: list of PDB IDs(e.g., ["9rm2", "9otp", "9ofx", "9r96", "9j4p"]) or leave it []

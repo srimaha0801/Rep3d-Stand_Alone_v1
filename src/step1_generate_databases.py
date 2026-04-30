@@ -601,10 +601,10 @@ def main(input_folder, output_dir):
 if __name__ == "__main__":
        
     # 📌 Paste your input folder path containing ('.pdb', '.cif', '.ent') files
-    input_folder = r"/path/to/input/folder"
+    input_folder = r"path/to/input"
     
     # 📌 Paste your output folder path where database files will be saved
-    output_db_dir = r"/path/to/output/folder"
+    output_db_dir = r"path/to/output"
     
     print("🚀 Script started...")
     # for folder in input_folder:
