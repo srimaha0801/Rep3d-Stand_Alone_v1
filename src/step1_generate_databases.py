@@ -12,7 +12,7 @@ from collections import defaultdict
 from concurrent.futures import ProcessPoolExecutor
 import tempfile
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
-
+from get_fasta import fasta_seq_main
 
 files = []
 seen_ids = set()
@@ -567,7 +567,7 @@ def main(input_folder, output_dir):
     # Create databases
     symbols_db = create_database(symbols_db_path)
     amino_acid_seq_db = create_database(amino_acid_seq_db_path)
-    
+    fasta_seq_db = fasta_seq_main(input_folder, amino_acid_seq_db_path)
     for filename in os.listdir(input_folder):
         if filename.endswith(".gz"):
             gz_path = os.path.join(input_folder, filename)
@@ -604,7 +604,7 @@ if __name__ == "__main__":
     input_folder = r"path/to/input"
     
     # 📌 Paste your output folder path where database files will be saved
-    output_db_dir = r"path/to/output"
+    output_db_dir = r"path/to/out"
     
     print("🚀 Script started...")
     # for folder in input_folder:
