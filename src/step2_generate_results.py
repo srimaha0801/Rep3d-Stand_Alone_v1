@@ -304,14 +304,19 @@ def main(usr_coord,results_path,symbols_db_path,amino_acid_seq_db_path,filters):
     user_sequence_str = ''.join(user_sequence)
     print("User-Provided Residue Symbol Sequence:", user_sequence_str, "Length : ",len(user_sequence_str))
     
-    match_pos_out = os.path.join(results_path,"A_Results.tsv")
+    match_pos_out = os.path.join(results_path,"A_Structure_similarity.tsv")
     if os.path.exists(match_pos_out):
-        add_tsv_header(usr_coord,user_sequence_str,match_pos_out)
-        
+        add_tsv_header(usr_coord,user_sequence_str,match_pos_out)  
     else:
         add_tsv_header(usr_coord,user_sequence_str,match_pos_out)
+
+    match_seq_out = os.path.join(results_path,"B_Sequence_similarity.tsv")
+    if os.path.exists(match_seq_out):
+        add_tsv_header(usr_coord,user_sequence_str,match_seq_out)  
+    else:
+        add_tsv_header(usr_coord,user_sequence_str,match_seq_out)
                    
-    headers = os.path.join(results_path,"B_Headers.tsv")
+    headers = os.path.join(results_path,"C_Headers.tsv")
     if os.path.exists(headers):
         add_tsv_header(usr_coord,user_sequence_str,headers)
     else:
@@ -367,14 +372,27 @@ def main(usr_coord,results_path,symbols_db_path,amino_acid_seq_db_path,filters):
                     continue
                 unique_pdb_ids.add(file)
                 print(f"{file}\t{chain}\t{real_start}\t{real_end}\t{matching_letters}\t{matching_amino_acids}")
-                df_row = pd.DataFrame({
+
+                df_structure = pd.DataFrame({
                     "PdbId_Chain": [f"{file}_{chain}"],
                     "Start_Position": [real_start],
                     "End_Position": [real_end],
                     "Sequence": [matching_amino_acids],
                     "Length": len(matching_amino_acids)
                 })
-                df_row.to_csv(match_pos_out,sep="\t",mode='a', index=False, header=write_header_match)
+                df_structure.to_csv(match_pos_out,sep="\t",mode='a',index=False,header=write_header_match)
+
+                fasta_start = start_idx + 1
+                fasta_end = end_idx
+
+                df_sequence = pd.DataFrame({
+                    "PdbId_Chain": [f"{file}_{chain}"],
+                    "Start_Position": [fasta_start],
+                    "End_Position": [fasta_end],
+                    "Sequence": [matching_amino_acids],
+                    "Length": [len(matching_amino_acids)]
+                })
+                df_sequence.to_csv(match_seq_out,sep="\t",mode='a', index=False, header=write_header_match)
                 total_results += 1
 
                 pdb_chain = f"{file}_{chain}"
@@ -408,7 +426,17 @@ def main(usr_coord,results_path,symbols_db_path,amino_acid_seq_db_path,filters):
     
 if __name__ == "__main__":
 
-    use_pdb_file_input = True   # switch between manual / file input
+    # 📌 Paste your symbols database path (symbols.db)
+    symbols_db_path = r"path/to/symbols_db"
+
+    # 📌 Paste your amino acid sequence database (amino_acid_seq.db)
+    amino_acid_seq_db_path = r"path/to/amino_acid_db"
+
+    # 📌 Output directory where results will be stored
+    results_path = r"path/to/results"
+    
+    # to extract coordinates from pdb file
+    use_pdb_file_input = False
 
     if use_pdb_file_input:
         pdb_file = input("📌 Enter PDB file path: ").strip()
@@ -432,15 +460,6 @@ if __name__ == "__main__":
     else:
         # 📌 Paste your coordinates
         usr_coord = "(19.262   0.072  21.331),(17.754   2.501  18.817),(14.012   3.223  18.875),(12.146   2.940  15.553),(9.876   5.731  14.223)"
-    
-    # 📌 Paste your symbols database path (symbols.db)
-    symbols_db_path = r"path/to/symbols.db"
-
-    # 📌 Paste your amino acid sequence database (amino_acid_seq.db)
-    amino_acid_seq_db_path = r"path/to/amino_acid_seq.db"
-
-    # 📌 Output directory where results will be stored
-    results_path = r"path/to/result/folder"
     
     # Filters
     # If you want filters → put True, else False
