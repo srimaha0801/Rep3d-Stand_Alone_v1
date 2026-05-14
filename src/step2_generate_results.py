@@ -245,7 +245,7 @@ def add_tsv_header(usr_coord,user_sequence_str,file):
     
     with open(file, "w") as f:
         f.truncate()
-        f.write("# Title: Rep3D : An algorithm to identify structurally similar repeats\n")
+        f.write("# Title : Rep3D: An algorithm to identify structurally similar motifs\n")
         f.write("# Authors: Gurleen Kaur, Madhumathi Sanjeevi, Srimaha Gandhi and Kanagaraj Sekar\n")
         f.write("# Institution: IISc, Bangalore.\n\n")
 
@@ -494,7 +494,7 @@ if __name__ == "__main__":
         pdb_file = input("📌 Enter PDB file path: ").strip()
         chain_id = input("📌 Enter Chain ID (e.g., A): ").strip()
 
-        pos_input = input("📌 Enter residue range (e.g., 2-6): ").strip()
+        pos_input = input("📌 Enter PDB residue range (e.g., 2-6): ").strip()
         start_res, end_res = map(int, pos_input.split("-"))
 
         print(f"\n Extracting CA coordinates from {pdb_file} | Chain {chain_id} ({start_res}-{end_res})")
@@ -502,7 +502,7 @@ if __name__ == "__main__":
         coords_with_ids = extract_ca_coordinates(pdb_file, start_res, end_res, chain_id)
 
         if not coords_with_ids:
-            print(" No coordinates found! Check chain or residue range.")
+            print(" No coordinates found! Check chain or PDB residue range.")
             exit()
 
         usr_coord = ",".join([coord for _, coord in coords_with_ids])
