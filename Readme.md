@@ -75,21 +75,46 @@ Before running, open:
 
 Inside the "if __name__ == '__main__':" block, provide:
 
-    • XYZ coordinates of the C-alpha (Cα) atoms
+    • XYZ coordinates of the C-alpha (Cα) atoms  OR  a PDB file input
     • Path to letter sequence DB
     • Path to amino acid sequence DB
     • Output directory path
 
-Notes for XYZ coordinates:
-    - Provide the coordinates for **Cα atoms only**.
-    - Coordinates must be in the following format:
-          (x1 y1 z1),(x2 y2 z2),(x3 y3 z3),...
-    - You must provide a **minimum of 5 Cα coordinates** for a valid search.
+Option 1: Manual XYZ Coordinates
 
+    Notes for XYZ coordinates:
+        - Provide the coordinates for **Cα atoms only**.
+        - Coordinates must be in the following format:
+            (x1 y1 z1),(x2 y2 z2),(x3 y3 z3),...
+        - You must provide a **minimum of 5 Cα coordinates** for a valid search.
+
+        - Example:
+            usr_coord = "(32.732  36.723   6.405),(33.094  34.136   9.151),(30.430  31.813   7.657),(32.172  31.710   4.261),(35.248  30.628   6.169),(33.312  27.796   7.786)"
+        - You can include more than 5 coordinates as needed for longer fragments.
+        - Set: use_pdb_file_input = False
+
+Option 2: Extract Coordinates from PDB File
+
+    You can extract Cα coordinates directly from a PDB file.
+    - Set:
+        use_pdb_file_input = True
+    - When running the script, you will be prompted to enter:
+        1. PDB file path
+        2. Chain ID (e.g., A)
+        3. Residue range (e.g., 2-6)
     - Example:
-          usr_coord = "(32.732  36.723   6.405),(33.094  34.136   9.151),(30.430  31.813   7.657),(32.172  31.710   4.261),(35.248  30.628   6.169),(33.312  27.796   7.786)"
-    - You can include more than 5 coordinates as needed for longer fragments.
+        Enter PDB file path: /path/to/file.pdb
+        Enter Chain ID: A
+        Enter residue range: 2-6
+    - The script will:
+        • Extract Cα atom coordinates from the given chain
+        • Convert them into the required format
+        • Automatically assign them to `usr_coord`
 
+    Notes:
+    - If use_pdb_file_input = True, manual coordinates will be ignored
+    - Ensure the chain ID exists in the PDB file
+    - Ensure the residue range is valid
 ```
 ### Optional Filtering
 
@@ -145,8 +170,11 @@ Example:
 
     if __name__ == "__main__":
 
-        # 📌 Paste your XYZ coordinates here
-        usr_coord = "(32.732  36.723   6.405),(33.094  34.136   9.151),(30.430  31.813   7.657),(32.172  31.710   4.261),(35.248  30.628   6.169),(33.312  27.796   7.786)"
+        # 📌 Paste your XYZ coordinates here (used only if use_pdb_file_input = False)
+        usr_coord = "(32.732  36.723   6.405),(33.094  34.136   9.151),(30.430  31.813   7.657),(32.172  31.710   4.261),(35.248  30.628   6.169)"
+
+        # 📌 Set to True to extract coordinates from a PDB file
+        use_pdb_file_input = False
 
         # 📌 Paste your letter sequence database (symbols.db)
         symbols_db_path = r"/path/to/databases/Bacillus_Thermoproteolyticus/Bacillus_Thermoproteolyticus_symbols.db"
