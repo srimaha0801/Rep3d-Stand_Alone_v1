@@ -143,16 +143,16 @@ def build_filter_query(filters):
         "solution nmr",
         "solid-state nmr"
     ]
-
+    print(filters)
     if "organism" in filters and filters["organism"].strip() != "":
-        conditions.append("LOWER(pdb_header.organism) = ?")
-        params.append(filters["organism"])
+        conditions.append("LOWER(pdb_header.organism) LIKE ?")
+        params.append(f"%{filters['organism'].lower()}%")
 
     if "method" in filters and filters["method"].strip() != "":
         method_value = filters["method"].strip()
         if method_value in valid_methods:
-            conditions.append("LOWER(pdb_header.method) = ?")
-            params.append(method_value)
+            conditions.append("LOWER(pdb_header.method) LIKE ?")
+            params.append(f"%{method_value}%")
         elif method_value == "hybrid":
             conditions.append("(LOWER(pdb_header.method) LIKE '%;%' OR LOWER(pdb_header.method) LIKE '%hybrid%')")
         elif method_value == "others":
@@ -192,7 +192,6 @@ def build_filter_query(filters):
             
     
     where_clause = " AND ".join(conditions) if conditions else "1=1"
-    # print(where_clause,params)
     return where_clause, params
 
 
@@ -407,38 +406,28 @@ def main(usr_coord,results_path,symbols_db_path,amino_acid_seq_db_path,filters):
                     # Find all matching positions
                     # -----------------------------------
                     fasta_matches = []
-
                     search_start = 0
 
                     while True:
-
                         fasta_pos = fasta_sequence.find(
                             matching_amino_acids,
                             search_start
                         )
-
                         if fasta_pos == -1:
                             break
-
                         fasta_matches.append(fasta_pos)
-
                         search_start = fasta_pos + 1
-
                     # -----------------------------------
                     # Select closest match
                     # -----------------------------------
                     if fasta_matches:
-
                         closest_match = min(
                             fasta_matches,
                             key=lambda x: abs(x - start_idx)
                         )
-
                         # Convert to 1-based indexing
                         fasta_start = closest_match + 1
-
                         fasta_end = closest_match + len(matching_amino_acids)
-
                 # -----------------------------------
                 # Sequence similarity dataframe
                 # FASTA positions
@@ -450,16 +439,7 @@ def main(usr_coord,results_path,symbols_db_path,amino_acid_seq_db_path,filters):
                     "Sequence": [matching_amino_acids],
                     "Length": [len(matching_amino_acids)]
                 })
-                # fasta_start = start_idx + 1
-                # fasta_end = end_idx
-
-                # df_sequence = pd.DataFrame({
-                #     "PdbId_Chain": [f"{file}_{chain}"],
-                #     "Start_Position": [fasta_start],
-                #     "End_Position": [fasta_end],
-                #     "Sequence": [matching_amino_acids],
-                #     "Length": [len(matching_amino_acids)]
-                # })
+                
                 df_sequence.to_csv(match_seq_out,sep="\t",mode='a', index=False, header=write_header_match)
                 total_results += 1
 
@@ -487,23 +467,27 @@ def main(usr_coord,results_path,symbols_db_path,amino_acid_seq_db_path,filters):
     execution_time = end_time - start_time
     print(f"Execution time: {end_time - start_time:.3f} seconds")
     append_tsv_footer(match_pos_out, execution_time,total_results,unique_pdb_ids)
-    
+    append_tsv_footer(match_seq_out, execution_time,total_results,unique_pdb_ids)
+    append_tsv_footer(headers, execution_time,total_results,unique_pdb_ids)
     print("✅ Script execution completed successfully!\n")
-    print(f"✅ Your output has been saved to: {match_pos_out}")
+    print(f"✅ Your output has been saved to: {results_path}")
     
     
 if __name__ == "__main__":
 
     # 📌 Paste your symbols database path (symbols.db)
-    symbols_db_path = r"path/to/input_symbols.db"
+    symbols_db_path = r"path/to/symbols.db"
 
     # 📌 Paste your amino acid sequence database (amino_acid_seq.db)
-    amino_acid_seq_db_path = r"path/to/input_amino_acid_seq.db"
+    amino_acid_seq_db_path = r"path/to/amino_acid_seq.db"
 
     # 📌 Output directory where results will be stored
-    results_path = r"path/to/out"
+    results_path = r"path/to/results"
     
-    # to extract coordinates from pdb file
+    # 📌 Option1: Paste coordinates here (leave empty if providing a PDB file)
+    usr_coord = ""
+    
+    # 📌 Option2: Set to True if you want to extract coordinates from a PDB file
     use_pdb_file_input = False
 
     if use_pdb_file_input:
@@ -523,12 +507,7 @@ if __name__ == "__main__":
 
         usr_coord = ",".join([coord for _, coord in coords_with_ids])
         print("\n Extracted Coordinates:",usr_coord)
-        
-
-    else:
-        # 📌 Paste your coordinates
-        usr_coord = "(19.262   0.072  21.331),(17.754   2.501  18.817),(14.012   3.223  18.875),(12.146   2.940  15.553),(9.876   5.731  14.223)"
-        
+               
     # Filters
     # If you want filters → put True, else False
     filter_choice = False
