@@ -1,4 +1,4 @@
-# Rep3D: An Algorithm to Identify Structurally Similar Repeats
+# Title : Rep3D: An algorithm to identify structurally similar motifs
 
 ## Authors
 Gurleen Kaur, Madhumathi Sanjeevi, Srimaha Gandhi and Kanagaraj Sekar 
@@ -101,11 +101,11 @@ Option 2: Extract Coordinates from PDB File
     - When running the script, you will be prompted to enter:
         1. PDB file path
         2. Chain ID (e.g., A)
-        3. Residue range (e.g., 2-6)
+        3. PDB Residue range (e.g., 2-6)
     - Example:
         Enter PDB file path: /path/to/file.pdb
         Enter Chain ID: A
-        Enter residue range: 2-6
+        Enter PDB residue range: 2-6
     - The script will:
         • Extract Cα atom coordinates from the given chain
         • Convert them into the required format
